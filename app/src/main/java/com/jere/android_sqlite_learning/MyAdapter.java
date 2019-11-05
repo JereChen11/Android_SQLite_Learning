@@ -1,5 +1,6 @@
 package com.jere.android_sqlite_learning;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private ArrayList<BusinessCard> mBusinessCardList;
+    private DataBaseHelper dataBaseHelper;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView portraitIv;
@@ -32,8 +34,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
-    public MyAdapter(ArrayList<BusinessCard> myDataset) {
-        mBusinessCardList = myDataset;
+    public MyAdapter(Context context, ArrayList<BusinessCard> businessCards) {
+
+        dataBaseHelper = new DataBaseHelper(context);
+        mBusinessCardList = businessCards;
     }
 
     @NonNull
