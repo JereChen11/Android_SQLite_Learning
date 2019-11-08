@@ -6,30 +6,43 @@ package com.jere.android_sqlite_learning;
 public class BusinessCard {
     public static final String TABLE_NAME = "BusinessCard";
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_PORTRAIT = "portrait";
+    public static final String COLUMN_AVATAR = "avatar";
     public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_GENDER = "gender";
     public static final String COLUMN_TELEPHONE = "telephone";
     public static final String COLUMN_ADDRESS = "address";
 
     public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_NAME + " TEXT,"
-            + COLUMN_PORTRAIT + " INTEGER,"
+            + COLUMN_GENDER + " INTEGER,"
+            + COLUMN_AVATAR + " INTEGER,"
             + COLUMN_TELEPHONE + " TEXT,"
             + COLUMN_ADDRESS + " TEXT"
             + ")";
 
-    private int portrait;
+    private int id;
+    private int avatar;
     private String name;
     private String telephone;
+    //true:male, false:female
+    private boolean gender;
     private String address;
 
-    public int getPortrait() {
-        return portrait;
+    public int getId() {
+        return id;
     }
 
-    public void setPortrait(int portrait) {
-        this.portrait = portrait;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(int avatar) {
+        this.avatar = avatar;
     }
 
     public String getName() {
@@ -40,11 +53,19 @@ public class BusinessCard {
         this.name = name;
     }
 
+    public boolean getGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
+    }
+
     public String getTelephone() {
         return telephone;
     }
 
-    public void setTelephont(String telephone) {
+    public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
 

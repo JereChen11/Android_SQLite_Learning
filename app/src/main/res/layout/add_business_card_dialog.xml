@@ -19,6 +19,42 @@
         android:hint="pls input Name"
         android:textColorHint="@color/colorAccent" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Male"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:layout_marginLeft="20dp" />
+
+        <CheckBox
+            android:id="@+id/male_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="female"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:layout_marginLeft="20dp"/>
+
+        <CheckBox
+            android:id="@+id/female_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+
     <EditText
         android:id="@+id/telephone_et"
         android:layout_width="match_parent"

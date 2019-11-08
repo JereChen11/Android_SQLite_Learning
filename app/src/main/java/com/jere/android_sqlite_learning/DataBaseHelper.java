@@ -38,22 +38,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public long insertBusinessCard(BusinessCard businessCard) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(BusinessCard.COLUMN_PORTRAIT, businessCard.getPortrait());
+        values.put(BusinessCard.COLUMN_AVATAR, businessCard.getGender() ? R.drawable.male_avatar_icon : R.drawable.female_avatar_icon);
         values.put(BusinessCard.COLUMN_NAME, businessCard.getName());
+        values.put(BusinessCard.COLUMN_GENDER, businessCard.getGender() ? 1 : 0);
         values.put(BusinessCard.COLUMN_TELEPHONE, businessCard.getTelephone());
         values.put(BusinessCard.COLUMN_ADDRESS, businessCard.getAddress());
-        long id = db.insert(BusinessCard.TABLE_NAME, null, values);
-        db.close();
-        return id;
-    }
-
-    public long insertBusinessCard(String name, String telephone, String address) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(BusinessCard.COLUMN_PORTRAIT, R.drawable.lakerteam);
-        values.put(BusinessCard.COLUMN_NAME, name);
-        values.put(BusinessCard.COLUMN_TELEPHONE, telephone);
-        values.put(BusinessCard.COLUMN_ADDRESS, address);
         long id = db.insert(BusinessCard.TABLE_NAME, null, values);
         db.close();
         return id;
@@ -64,8 +53,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columnArray = new String[]{
                 BusinessCard.COLUMN_ID,
-                BusinessCard.TABLE_NAME,
-                BusinessCard.COLUMN_PORTRAIT,
+                BusinessCard.COLUMN_NAME,
+                BusinessCard.COLUMN_GENDER,
+                BusinessCard.COLUMN_AVATAR,
                 BusinessCard.COLUMN_TELEPHONE,
                 BusinessCard.COLUMN_ADDRESS};
         Cursor cursor = db.query(BusinessCard.TABLE_NAME,
@@ -76,13 +66,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToNext()) {
 
             String name = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_NAME));
-            int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_PORTRAIT));
+            int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_AVATAR));
             String telephone = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_TELEPHONE));
             String address = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_ADDRESS));
+            int gender = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_GENDER));
             businessCard.setName(name);
-            businessCard.setPortrait(portrait);
-            businessCard.setTelephont(telephone);
+            businessCard.setAvatar(portrait);
+            businessCard.setTelephone(telephone);
             businessCard.setAddress(address);
+            businessCard.setGender(gender == 1);
 
             cursor.close();
         }
@@ -100,13 +92,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 BusinessCard businessCard = new BusinessCard();
                 String name = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_NAME));
-                int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_PORTRAIT));
+                int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_AVATAR));
                 String telephone = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_TELEPHONE));
                 String address = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_ADDRESS));
+                int gender = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_GENDER));
                 businessCard.setName(name);
-                businessCard.setPortrait(portrait);
-                businessCard.setTelephont(telephone);
+                businessCard.setAvatar(portrait);
+                businessCard.setTelephone(telephone);
                 businessCard.setAddress(address);
+                businessCard.setGender(gender == 1);
 
                 businessCardsList.add(businessCard);
             }
@@ -130,10 +124,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(BusinessCard.COLUMN_PORTRAIT, businessCard.getPortrait());
+        values.put(BusinessCard.COLUMN_AVATAR, businessCard.getAvatar());
         values.put(BusinessCard.COLUMN_NAME, businessCard.getName());
         values.put(BusinessCard.COLUMN_TELEPHONE, businessCard.getTelephone());
         values.put(BusinessCard.COLUMN_ADDRESS, businessCard.getAddress());
+        values.put(BusinessCard.COLUMN_GENDER, businessCard.getGender() ? 1 : 0);
         int idReturnByUpdate = db.update(BusinessCard.TABLE_NAME, values, BusinessCard.COLUMN_ID + " =? ", new String[]{String.valueOf(id)});
         db.close();
         return idReturnByUpdate;

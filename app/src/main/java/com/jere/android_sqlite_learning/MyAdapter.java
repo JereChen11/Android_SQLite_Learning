@@ -20,14 +20,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private DataBaseHelper dataBaseHelper;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView portraitIv;
+        ImageView avatarIv  ;
         TextView nameTv;
         TextView telephoneTv;
         TextView addressTv;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            portraitIv = itemView.findViewById(R.id.portrait_iv);
+            avatarIv = itemView.findViewById(R.id.portrait_iv);
             nameTv = itemView.findViewById(R.id.name_tv);
             telephoneTv = itemView.findViewById(R.id.telephone_tv);
             addressTv = itemView.findViewById(R.id.address_tv);
@@ -52,8 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         BusinessCard businessCard = mBusinessCardList.get(position);
-        holder.portraitIv.setImageResource(R.drawable.ic_launcher_background);
-        holder.portraitIv.setImageResource(businessCard.getPortrait());
+        holder.avatarIv.setImageResource(businessCard.getAvatar());
         holder.nameTv.setText(businessCard.getName());
         holder.telephoneTv.setText(businessCard.getTelephone());
         holder.addressTv.setText(businessCard.getAddress());

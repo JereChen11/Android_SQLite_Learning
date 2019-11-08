@@ -14,21 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
  * @author jere
  */
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
     private ArrayList<BusinessCard> businessCardsList = new ArrayList<>();
-    private DataBaseHelper dataBaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.my_recycler_view);
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView recyclerView = findViewById(R.id.my_recycler_view);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        dataBaseHelper = new DataBaseHelper(this);
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         businessCardsList = dataBaseHelper.getAllBusinessCards();
         mAdapter = new MyAdapter(this, businessCardsList);
         recyclerView.setAdapter(mAdapter);
