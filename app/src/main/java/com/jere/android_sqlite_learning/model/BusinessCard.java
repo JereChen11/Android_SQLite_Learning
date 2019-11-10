@@ -1,4 +1,4 @@
-package com.jere.android_sqlite_learning;
+package com.jere.android_sqlite_learning.model;
 
 /**
  * @author jere

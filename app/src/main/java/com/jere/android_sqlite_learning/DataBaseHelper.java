@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.jere.android_sqlite_learning.model.BusinessCard;
+
 import java.util.ArrayList;
 
 import androidx.annotation.Nullable;
@@ -119,7 +121,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    //todo update TABLE all filed, or only update TAble one filed
     public int updateBusinessCard(int id, BusinessCard businessCard) {
         SQLiteDatabase db = getWritableDatabase();
 

@@ -1,13 +1,17 @@
-package com.jere.android_sqlite_learning;
+package com.jere.android_sqlite_learning.customdialog;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.jere.android_sqlite_learning.DataBaseHelper;
+import com.jere.android_sqlite_learning.IGenerateBusinessCardListener;
+import com.jere.android_sqlite_learning.R;
+import com.jere.android_sqlite_learning.model.BusinessCard;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -28,7 +32,7 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     private CheckBox maleCb;
     private CheckBox femaleCb;
 
-    MyBusinessCardDialog(Context context, boolean isUpdateCardInfo) {
+    public MyBusinessCardDialog(Context context, boolean isUpdateCardInfo) {
         this.context = context;
         dataBaseHelper = new DataBaseHelper(context);
         this.isUpdateCardInfo = isUpdateCardInfo;
@@ -67,38 +71,21 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.yes_btn:
-                BusinessCard businessCard = new BusinessCard();
-                if (!maleCb.isChecked() && !femaleCb.isChecked()) {
+                BusinessCard newBusinessCard = generateNewBusinessCard();
+                if (newBusinessCard == null) {
                     Toast.makeText(context, "pls select gender!", Toast.LENGTH_SHORT).show();
                     return;
-                } else if (maleCb.isChecked()){
-                    businessCard.setGender(true);
-                } else {
-                    businessCard.setGender(false);
                 }
-                businessCard.setName(nameEt.getText().toString());
-                businessCard.setTelephone(telephoneEt.getText().toString());
-                businessCard.setAddress(addressEt.getText().toString());
-                businessCard.setAvatar(businessCard.getGender() ? R.drawable.male_avatar_icon : R.drawable.female_avatar_icon);
 
-                //todo insert or update database and notifyDataSetChanged
-//                businessCardList.add(businessCard);
-//                mAdapter.notifyDataSetChanged();
                 if (isUpdateCardInfo) {
-                    int oldBusinessCardId = dataBaseHelper.getBusinessCardId(oldBusinessCard);
-                    long id = dataBaseHelper.updateBusinessCard(oldBusinessCardId, businessCard);
-                    mListener.getBusinessCard(businessCard);
-                    Log.d(TAG, "onClick: updateBusinessCard id = " + id);
+                    updateDatabaseBusinessCardInfo(newBusinessCard);
                 } else {
-                    long id = dataBaseHelper.insertBusinessCard(businessCard);
-                    mListener.getBusinessCard(businessCard);
-                    Log.d(TAG, "onClick: insertBusinessCard id = " + id);
+                    insertBusinessCardDataToDatabase(newBusinessCard);
                 }
 
                 alertDialog.dismiss();
                 break;
             case R.id.no_btn:
-                //todo no action
                 alertDialog.dismiss();
                 break;
             case R.id.male_cb:
@@ -106,16 +93,42 @@ public class MyBusinessCardDialog implements View.OnClickListener {
                 if (maleCb.isChecked()) {
                     femaleCb.setChecked(false);
                 }
-                Toast.makeText(context, "maleCb isChecked: " + maleCb.isChecked(), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.female_cb:
+                //sure client only select one checkbox, can't select maleCb and female together
                 if (femaleCb.isChecked()) {
                     maleCb.setChecked(false);
                 }
-                Toast.makeText(context, "maleCb isChecked: " + femaleCb.isChecked(), Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
         }
+    }
+
+    private BusinessCard generateNewBusinessCard() {
+        BusinessCard businessCard = new BusinessCard();
+        if (!maleCb.isChecked() && !femaleCb.isChecked()) {
+            return null;
+        } else if (maleCb.isChecked()) {
+            businessCard.setGender(true);
+        } else {
+            businessCard.setGender(false);
+        }
+        businessCard.setName(nameEt.getText().toString());
+        businessCard.setTelephone(telephoneEt.getText().toString());
+        businessCard.setAddress(addressEt.getText().toString());
+        businessCard.setAvatar(businessCard.getGender() ? R.drawable.male_avatar_icon : R.drawable.female_avatar_icon);
+
+        return businessCard;
+    }
+
+    private void updateDatabaseBusinessCardInfo(BusinessCard businessCard) {
+        dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCard);
+        mListener.getBusinessCard(businessCard);
+    }
+
+    private void insertBusinessCardDataToDatabase(BusinessCard businessCard) {
+        dataBaseHelper.insertBusinessCard(businessCard);
+        mListener.getBusinessCard(businessCard);
     }
 }

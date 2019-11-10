@@ -1,11 +1,12 @@
 package com.jere.android_sqlite_learning;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.jere.android_sqlite_learning.model.BusinessCard;
 
 import java.util.ArrayList;
 
@@ -15,9 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * @author jere
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder> {
     private ArrayList<BusinessCard> mBusinessCardList;
-    private DataBaseHelper dataBaseHelper;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView avatarIv  ;
@@ -27,16 +27,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            avatarIv = itemView.findViewById(R.id.portrait_iv);
+            avatarIv = itemView.findViewById(R.id.avatar_iv);
             nameTv = itemView.findViewById(R.id.name_tv);
             telephoneTv = itemView.findViewById(R.id.telephone_tv);
             addressTv = itemView.findViewById(R.id.address_tv);
         }
     }
 
-    public MyAdapter(Context context, ArrayList<BusinessCard> businessCards) {
-
-        dataBaseHelper = new DataBaseHelper(context);
+    public MyRecyclerViewAdapter(ArrayList<BusinessCard> businessCards) {
         mBusinessCardList = businessCards;
     }
 

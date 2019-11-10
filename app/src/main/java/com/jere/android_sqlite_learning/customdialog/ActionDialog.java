@@ -1,9 +1,14 @@
-package com.jere.android_sqlite_learning;
+package com.jere.android_sqlite_learning.customdialog;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+
+import com.jere.android_sqlite_learning.DataBaseHelper;
+import com.jere.android_sqlite_learning.IGenerateBusinessCardListener;
+import com.jere.android_sqlite_learning.R;
+import com.jere.android_sqlite_learning.model.BusinessCard;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -12,15 +17,13 @@ import androidx.appcompat.app.AlertDialog;
  */
 public class ActionDialog implements View.OnClickListener {
     private Context mContext;
-    private int mPosition;
     private DataBaseHelper dataBaseHelper;
     private AlertDialog mDialog;
     private IGenerateBusinessCardListener mListener;
     private BusinessCard businessCard;
 
-    ActionDialog(Context context, int position) {
+    public ActionDialog(Context context) {
         mContext = context;
-        mPosition = position;
         dataBaseHelper = new DataBaseHelper(context);
     }
 

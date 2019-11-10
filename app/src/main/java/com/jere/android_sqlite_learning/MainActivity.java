@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.jere.android_sqlite_learning.customdialog.ActionDialog;
+import com.jere.android_sqlite_learning.customdialog.MyBusinessCardDialog;
+import com.jere.android_sqlite_learning.model.BusinessCard;
+
 import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         businessCardsList = dataBaseHelper.getAllBusinessCards();
-        mAdapter = new MyAdapter(this, businessCardsList);
+        mAdapter = new MyRecyclerViewAdapter(businessCardsList);
         recyclerView.setAdapter(mAdapter);
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, final int position) {
-                        ActionDialog actionDialog = new ActionDialog(MainActivity.this, position);
+                        ActionDialog actionDialog = new ActionDialog(MainActivity.this);
                         BusinessCard businessCard = businessCardsList.get(position);
                         actionDialog.createDialogAndShow(businessCard, new IGenerateBusinessCardListener() {
                             @Override
