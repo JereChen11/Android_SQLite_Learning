@@ -196,12 +196,22 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     }
 
     private void updateDatabaseBusinessCardInfo(BusinessCard businessCard) {
-        dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCard);
-        mListener.getBusinessCard(businessCard);
+        int updateRow = dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCard);
+        if (updateRow > 0) {
+            mListener.getBusinessCard(businessCard);
+        } else {
+            Toast.makeText(context, "Update BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void insertBusinessCardDataToDatabase(BusinessCard businessCard) {
-        dataBaseHelper.insertBusinessCard(businessCard);
-        mListener.getBusinessCard(businessCard);
+        long idReturnByInsert = dataBaseHelper.insertBusinessCard(businessCard);
+        if (idReturnByInsert > -1) {
+            businessCard.setId((int) idReturnByInsert);
+            mListener.getBusinessCard(businessCard);
+        } else {
+            Toast.makeText(context, "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }

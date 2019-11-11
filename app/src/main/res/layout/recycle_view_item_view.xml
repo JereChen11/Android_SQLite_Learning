@@ -11,7 +11,6 @@
         android:layout_height="80dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
-        android:src="@drawable/male_avatar_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:text="name"
             android:textColor="@color/black"
             android:textSize="23sp" />
 
@@ -41,7 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:maxLines="1"
-            android:text="telephone"
             android:textColor="@color/dark_slate_gray"
             android:textSize="20sp" />
 
@@ -51,7 +48,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
             android:maxLines="1"
-            android:text="address"
             android:textColor="@color/dim_gray"
             android:textSize="20sp" />
 

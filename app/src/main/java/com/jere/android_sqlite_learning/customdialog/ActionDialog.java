@@ -56,8 +56,7 @@ public class ActionDialog implements View.OnClickListener {
                 break;
             case R.id.delete_btn:
                 mDialog.dismiss();
-                int id = dataBaseHelper.getBusinessCardId(businessCard);
-                dataBaseHelper.deleteBusinessCard(id);
+                dataBaseHelper.deleteBusinessCard(businessCard.getId());
                 mListener.getBusinessCard(null);
                 break;
             default:

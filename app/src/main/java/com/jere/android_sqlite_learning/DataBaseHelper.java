@@ -37,6 +37,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
+    /**
+     *
+     * @param businessCard
+     * @return 返回新插入的行的ID，发生错误，插入不成功，则返回-1
+     */
     public long insertBusinessCard(BusinessCard businessCard) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -50,6 +55,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    /**
+     *
+     * @param searchName query database by name
+     * @return BusinessCard
+     */
     public BusinessCard getBusinessCardQueryByName(String searchName) {
         BusinessCard businessCard = new BusinessCard();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -66,11 +76,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 new String[]{searchName},
                 null, null, null);
         if (cursor != null && cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_ID));
             String name = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_NAME));
             int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_AVATAR));
             String telephone = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_TELEPHONE));
             String address = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_ADDRESS));
             int gender = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_GENDER));
+            businessCard.setId(id);
             businessCard.setName(name);
             businessCard.setAvatar(portrait);
             businessCard.setTelephone(telephone);
@@ -83,6 +95,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    /**
+     *
+     * @return 读取数据库，返回一个 BusinessCard 类型的 ArrayList
+     */
     public ArrayList<BusinessCard> getAllBusinessCards() {
         ArrayList<BusinessCard> businessCardsList = new ArrayList<>();
 
@@ -93,11 +109,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 BusinessCard businessCard = new BusinessCard();
+                int id = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_ID));
                 String name = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_NAME));
                 int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_AVATAR));
                 String telephone = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_TELEPHONE));
                 String address = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_ADDRESS));
                 int gender = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_GENDER));
+                businessCard.setId(id);
                 businessCard.setName(name);
                 businessCard.setAvatar(portrait);
                 businessCard.setTelephone(telephone);
@@ -112,6 +130,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return businessCardsList;
     }
 
+    /**
+     *
+     * @return 返回数据库行数
+     */
     public int getBusinessCardCount() {
         String countQuery = "SELECT * FROM " + BusinessCard.TABLE_NAME;
         SQLiteDatabase db = getReadableDatabase();
@@ -121,6 +143,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    /**
+     *
+     * @param id update row id （需要更新的ID）
+     * @param businessCard update value （去更新数据库的内容）
+     * @return the number of rows affected (影响到的行数，如果没更新成功，返回0。所以当return 0时，需要告诉用户更新不成功)
+     */
     public int updateBusinessCard(int id, BusinessCard businessCard) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -135,24 +163,27 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return idReturnByUpdate;
     }
 
-    public void deleteBusinessCard(int id) {
+    /**
+     *
+     * @param id the database table row id need to delete(需要删除的数据库表中行的ID)
+     * @return 返回影响到的行数，如果在 whereClause 有传入条件，返回该条件下影响到的行数，否则返回0。
+     * 想要删除所有行，只要在 whereClause 传入 String "1"，并返回删除掉的行数总数（比如：删除了四行就返回4）
+     */
+    public int deleteBusinessCard(int id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(BusinessCard.TABLE_NAME, BusinessCard.COLUMN_ID + "=? ", new String[]{String.valueOf(id)});
+        int idReturnByDelete = db.delete(BusinessCard.TABLE_NAME, BusinessCard.COLUMN_ID + "=? ", new String[]{String.valueOf(id)});
         db.close();
+        return idReturnByDelete;
     }
 
-    public int getBusinessCardId(BusinessCard businessCard) {
-        int id = 0;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(BusinessCard.TABLE_NAME,
-                null,
-                BusinessCard.COLUMN_NAME + "=? ",
-                new String[]{String.valueOf(businessCard.getName())},
-                null, null, null);
-        if (cursor != null && cursor.moveToNext()) {
-            id = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_ID));
-            cursor.close();
-        }
-        return id;
+    /**
+     * 删除所有行，whereClause 传入 String "1"
+     * @return 返回删除掉的行数总数（比如：删除了四行就返回4）
+     */
+    public int deleteAllBusinessCard() {
+        SQLiteDatabase db = getWritableDatabase();
+        int idReturnByDelete = db.delete(BusinessCard.TABLE_NAME, String.valueOf(1), null);
+        db.close();
+        return idReturnByDelete;
     }
 }
