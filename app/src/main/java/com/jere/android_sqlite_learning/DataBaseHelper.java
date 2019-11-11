@@ -50,7 +50,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public BusinessCard getBusinessCard(long id) {
+    public BusinessCard getBusinessCardQueryByName(String searchName) {
         BusinessCard businessCard = new BusinessCard();
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columnArray = new String[]{
@@ -62,11 +62,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 BusinessCard.COLUMN_ADDRESS};
         Cursor cursor = db.query(BusinessCard.TABLE_NAME,
                 columnArray,
-                BusinessCard.COLUMN_ID + "=? ",
-                new String[]{String.valueOf(id)},
+                BusinessCard.COLUMN_NAME + "=? ",
+                new String[]{searchName},
                 null, null, null);
         if (cursor != null && cursor.moveToNext()) {
-
             String name = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_NAME));
             int portrait = cursor.getInt(cursor.getColumnIndex(BusinessCard.COLUMN_AVATAR));
             String telephone = cursor.getString(cursor.getColumnIndex(BusinessCard.COLUMN_TELEPHONE));
@@ -79,8 +78,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             businessCard.setGender(gender == 1);
 
             cursor.close();
+            return businessCard;
         }
-        return businessCard;
+        return null;
     }
 
     public ArrayList<BusinessCard> getAllBusinessCards() {

@@ -7,6 +7,7 @@ import android.widget.Button;
 
 import com.jere.android_sqlite_learning.DataBaseHelper;
 import com.jere.android_sqlite_learning.IGenerateBusinessCardListener;
+import com.jere.android_sqlite_learning.OperationTypeEnum;
 import com.jere.android_sqlite_learning.R;
 import com.jere.android_sqlite_learning.model.BusinessCard;
 
@@ -48,8 +49,10 @@ public class ActionDialog implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.edit_btn:
                 mDialog.dismiss();
-                MyBusinessCardDialog myBusinessCardDialog = new MyBusinessCardDialog(mContext, true);
-                myBusinessCardDialog.createDialogAndShow(businessCard, mListener);
+                new MyBusinessCardDialog(mContext,
+                        OperationTypeEnum.UPDATE,
+                        businessCard,
+                        mListener);
                 break;
             case R.id.delete_btn:
                 mDialog.dismiss();
