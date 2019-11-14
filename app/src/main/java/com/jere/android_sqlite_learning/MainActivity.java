@@ -1,6 +1,7 @@
 package com.jere.android_sqlite_learning;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.jere.android_sqlite_learning.customdialog.ActionDialog;
 import com.jere.android_sqlite_learning.customdialog.MyBusinessCardDialog;
 import com.jere.android_sqlite_learning.model.BusinessCard;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,9 +41,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         dataBaseHelper = new DataBaseHelper(this);
-        businessCardsList = dataBaseHelper.getAllBusinessCards();
+        GetAllBusinessCardsAsyncTask getAllBusinessCardsAsyncTask = new GetAllBusinessCardsAsyncTask(this);
+        getAllBusinessCardsAsyncTask.execute();
         mAdapter = new MyRecyclerViewAdapter(businessCardsList);
         recyclerView.setAdapter(mAdapter);
+
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addBtn.setOnClickListener(this);
         Button startSearchBtn = findViewById(R.id.start_search_btn);
         startSearchBtn.setOnClickListener(this);
+
         inputSearchNameEt = findViewById(R.id.search_input_name_et);
         inputSearchNameEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -108,23 +113,93 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startQueryDatabase() {
-        BusinessCard businessCard =
-                dataBaseHelper.getBusinessCardQueryByName(inputSearchNameEt.getText().toString());
-        if (businessCard == null) {
-            Toast.makeText(MainActivity.this,
-                    "The people not survive in your list",
-                    Toast.LENGTH_SHORT)
-                    .show();
-        } else {
-            new MyBusinessCardDialog(MainActivity.this, OperationTypeEnum.QUERY, businessCard);
-            inputSearchNameEt.setText("");
-        }
-        hideSoftKeyboard();
+        QueryByBusinessCardNameAsyncTask queryByBusinessCardNameAsyncTask = new QueryByBusinessCardNameAsyncTask(this);
+        queryByBusinessCardNameAsyncTask.execute(inputSearchNameEt.getText().toString());
     }
 
     public void hideSoftKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dataBaseHelper.close();
+    }
+
+    private static class GetAllBusinessCardsAsyncTask extends AsyncTask<Void, Void, ArrayList<BusinessCard>> {
+
+        private WeakReference<MainActivity> activityWeakReference;
+        private RecyclerView recyclerView;
+
+        GetAllBusinessCardsAsyncTask(MainActivity context, RecyclerView recyclerView) {
+            activityWeakReference = new WeakReference<>(context);
+            this.recyclerView = recyclerView;
+        }
+
+        @Override
+        protected ArrayList<BusinessCard> doInBackground(Void... voids) {
+//            if (mainActivity != null && !mainActivity.isFinishing()) {
+//            }
+            ArrayList<BusinessCard> businessCards = new ArrayList<>();
+
+            MainActivity mainActivity = activityWeakReference.get();
+            if (mainActivity != null) {
+                businessCards = new DataBaseHelper(mainActivity).getAllBusinessCards();
+            }
+            return businessCards;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusinessCard> businessCards) {
+            super.onPostExecute(businessCards);
+            MainActivity mainActivity = activityWeakReference.get();
+            if (mainActivity != null && !mainActivity.isFinishing()) {
+                mainActivity.businessCardsList = businessCards;
+                mainActivity.mAdapter = new MyRecyclerViewAdapter(businessCards);
+                recyclerView.setAdapter();
+            }
+        }
+    }
+
+    private static class QueryByBusinessCardNameAsyncTask extends AsyncTask<String, Void, BusinessCard> {
+
+        private WeakReference<MainActivity> activityWeakReference;
+
+        QueryByBusinessCardNameAsyncTask(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected BusinessCard doInBackground(String... strings) {
+            String inputSearchNameString = strings[0];
+            MainActivity mainActivity = activityWeakReference.get();
+            if (mainActivity != null && !mainActivity.isFinishing()) {
+                return new DataBaseHelper(mainActivity).getBusinessCardQueryByName(inputSearchNameString);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(BusinessCard businessCard) {
+            super.onPostExecute(businessCard);
+            MainActivity mainActivity = activityWeakReference.get();
+            if (mainActivity != null && !mainActivity.isFinishing()) {
+                if (businessCard != null) {
+                    new MyBusinessCardDialog(mainActivity, OperationTypeEnum.QUERY, businessCard);
+                    mainActivity.inputSearchNameEt.setText("");
+                } else {
+                    Toast.makeText(mainActivity,
+                            "The people not survive in your list",
+                            Toast.LENGTH_SHORT)
+                            .show();
+                }
+                mainActivity.hideSoftKeyboard();
+            }
+        }
     }
 
 }

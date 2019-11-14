@@ -1,6 +1,7 @@
 package com.jere.android_sqlite_learning.customdialog;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,8 @@ import com.jere.android_sqlite_learning.IGenerateBusinessCardListener;
 import com.jere.android_sqlite_learning.OperationTypeEnum;
 import com.jere.android_sqlite_learning.R;
 import com.jere.android_sqlite_learning.model.BusinessCard;
+
+import java.lang.ref.WeakReference;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -196,22 +199,71 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     }
 
     private void updateDatabaseBusinessCardInfo(BusinessCard businessCard) {
-        int updateRow = dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCard);
-        if (updateRow > 0) {
-            mListener.getBusinessCard(businessCard);
-        } else {
-            Toast.makeText(context, "Update BusinessCard Failed!", Toast.LENGTH_SHORT).show();
-        }
+        UpdateBusinessCardAsyncTask updateBusinessCardAsyncTask = new UpdateBusinessCardAsyncTask();
+        updateBusinessCardAsyncTask.execute(businessCard);
     }
 
     private void insertBusinessCardDataToDatabase(BusinessCard businessCard) {
-        long idReturnByInsert = dataBaseHelper.insertBusinessCard(businessCard);
-        if (idReturnByInsert > -1) {
-            businessCard.setId((int) idReturnByInsert);
-            mListener.getBusinessCard(businessCard);
-        } else {
-            Toast.makeText(context, "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+        InsertBusinessCardAsyncTask insertBusinessCardAsyncTask = new InsertBusinessCardAsyncTask(context, mListener);
+        insertBusinessCardAsyncTask.execute(businessCard);
+    }
+
+
+    private class UpdateBusinessCardAsyncTask extends AsyncTask<BusinessCard, Void, BusinessCard> {
+
+        @Override
+        protected BusinessCard doInBackground(BusinessCard... businessCards) {
+            int theNumberAfterUpdate = dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCards[0]);
+            if (theNumberAfterUpdate > 0) {
+                return businessCards[0];
+            }
+            return null;
         }
 
+        @Override
+        protected void onPostExecute(BusinessCard businessCard) {
+            super.onPostExecute(businessCard);
+            if (businessCard != null) {
+                mListener.getBusinessCard(businessCard);
+            } else {
+                Toast.makeText(context, "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private static class InsertBusinessCardAsyncTask extends AsyncTask<BusinessCard, Void, BusinessCard> {
+        private WeakReference<Context> contextWeakReference;
+        private IGenerateBusinessCardListener iGenerateBusinessCardListener;
+
+        InsertBusinessCardAsyncTask(Context context, IGenerateBusinessCardListener listener) {
+            contextWeakReference = new WeakReference<>(context);
+            iGenerateBusinessCardListener = listener;
+        }
+
+        @Override
+        protected BusinessCard doInBackground(BusinessCard... businessCards) {
+            BusinessCard businessCard = businessCards[0];
+            long idReturnByInsert = -1;
+            if (contextWeakReference.get() != null) {
+                idReturnByInsert = new DataBaseHelper(contextWeakReference.get()).insertBusinessCard(businessCard);
+            }
+            if (idReturnByInsert > -1) {
+                businessCard.setId((int) idReturnByInsert);
+                return businessCard;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(BusinessCard businessCard) {
+            super.onPostExecute(businessCard);
+            if (contextWeakReference.get() != null) {
+                if (businessCard != null) {
+                    iGenerateBusinessCardListener.getBusinessCard(businessCard);
+                } else {
+                    Toast.makeText(contextWeakReference.get(), "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 }

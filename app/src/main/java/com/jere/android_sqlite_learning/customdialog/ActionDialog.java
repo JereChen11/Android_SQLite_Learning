@@ -1,6 +1,7 @@
 package com.jere.android_sqlite_learning.customdialog;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,8 @@ import com.jere.android_sqlite_learning.OperationTypeEnum;
 import com.jere.android_sqlite_learning.R;
 import com.jere.android_sqlite_learning.model.BusinessCard;
 
+import java.lang.ref.WeakReference;
+
 import androidx.appcompat.app.AlertDialog;
 
 /**
@@ -18,14 +21,12 @@ import androidx.appcompat.app.AlertDialog;
  */
 public class ActionDialog implements View.OnClickListener {
     private Context mContext;
-    private DataBaseHelper dataBaseHelper;
     private AlertDialog mDialog;
     private IGenerateBusinessCardListener mListener;
     private BusinessCard businessCard;
 
     public ActionDialog(Context context) {
         mContext = context;
-        dataBaseHelper = new DataBaseHelper(context);
     }
 
     public void createDialogAndShow(BusinessCard businessCard, IGenerateBusinessCardListener listener) {
@@ -56,11 +57,30 @@ public class ActionDialog implements View.OnClickListener {
                 break;
             case R.id.delete_btn:
                 mDialog.dismiss();
-                dataBaseHelper.deleteBusinessCard(businessCard.getId());
+                DeleteBusinessCardAsyncTask deleteBusinessCardAsyncTask = new DeleteBusinessCardAsyncTask(mContext);
+                deleteBusinessCardAsyncTask.execute(businessCard.getId());
                 mListener.getBusinessCard(null);
                 break;
             default:
                 break;
+        }
+    }
+
+    private static class DeleteBusinessCardAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        private WeakReference<Context> contextWeakReference;
+
+        DeleteBusinessCardAsyncTask(Context context) {
+            contextWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            Context context = contextWeakReference.get();
+            if (context != null) {
+                new DataBaseHelper(context).deleteBusinessCard(integers[0]);
+            }
+            return null;
         }
     }
 }
