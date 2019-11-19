@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         dataBaseHelper = new DataBaseHelper(this);
-        GetAllBusinessCardsAsyncTask getAllBusinessCardsAsyncTask = new GetAllBusinessCardsAsyncTask(this);
-        getAllBusinessCardsAsyncTask.execute();
         mAdapter = new MyRecyclerViewAdapter(businessCardsList);
         recyclerView.setAdapter(mAdapter);
+        GetAllBusinessCardsAsyncTask getAllBusinessCardsAsyncTask = new GetAllBusinessCardsAsyncTask(this);
+        getAllBusinessCardsAsyncTask.execute();
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new RecyclerItemClickListener.OnItemClickListener() {
@@ -133,17 +133,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static class GetAllBusinessCardsAsyncTask extends AsyncTask<Void, Void, ArrayList<BusinessCard>> {
 
         private WeakReference<MainActivity> activityWeakReference;
-        private RecyclerView recyclerView;
 
-        GetAllBusinessCardsAsyncTask(MainActivity context, RecyclerView recyclerView) {
+        GetAllBusinessCardsAsyncTask(MainActivity context) {
             activityWeakReference = new WeakReference<>(context);
-            this.recyclerView = recyclerView;
         }
 
         @Override
         protected ArrayList<BusinessCard> doInBackground(Void... voids) {
-//            if (mainActivity != null && !mainActivity.isFinishing()) {
-//            }
             ArrayList<BusinessCard> businessCards = new ArrayList<>();
 
             MainActivity mainActivity = activityWeakReference.get();
@@ -159,8 +155,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             MainActivity mainActivity = activityWeakReference.get();
             if (mainActivity != null && !mainActivity.isFinishing()) {
                 mainActivity.businessCardsList = businessCards;
+//                mainActivity.mAdapter.notifyDataSetChanged();
+
+                RecyclerView recyclerView = mainActivity.findViewById(R.id.my_recycler_view);
                 mainActivity.mAdapter = new MyRecyclerViewAdapter(businessCards);
-                recyclerView.setAdapter();
+                recyclerView.setAdapter(mainActivity.mAdapter);
             }
         }
     }

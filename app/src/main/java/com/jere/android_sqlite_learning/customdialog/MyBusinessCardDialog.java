@@ -30,7 +30,6 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     private EditText nameEt;
     private EditText telephoneEt;
     private EditText addressEt;
-    private DataBaseHelper dataBaseHelper;
     private Button yesBtn;
     private Button noBtn;
     private IGenerateBusinessCardListener mListener;
@@ -44,7 +43,6 @@ public class MyBusinessCardDialog implements View.OnClickListener {
                                 BusinessCard businessCard,
                                 IGenerateBusinessCardListener listener) {
         this.context = context;
-        dataBaseHelper = new DataBaseHelper(context);
         operationType = operationTypeEnum;
         oldBusinessCard = businessCard;
         mListener = listener;
@@ -55,7 +53,6 @@ public class MyBusinessCardDialog implements View.OnClickListener {
                                 OperationTypeEnum operationTypeEnum,
                                 IGenerateBusinessCardListener listener) {
         this.context = context;
-        dataBaseHelper = new DataBaseHelper(context);
         operationType = operationTypeEnum;
         mListener = listener;
         createDialogAndShow();
@@ -65,7 +62,6 @@ public class MyBusinessCardDialog implements View.OnClickListener {
                                 OperationTypeEnum operationTypeEnum,
                                 BusinessCard businessCard) {
         this.context = context;
-        dataBaseHelper = new DataBaseHelper(context);
         operationType = operationTypeEnum;
         oldBusinessCard = businessCard;
         createDialogAndShow();
@@ -199,7 +195,8 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     }
 
     private void updateDatabaseBusinessCardInfo(BusinessCard businessCard) {
-        UpdateBusinessCardAsyncTask updateBusinessCardAsyncTask = new UpdateBusinessCardAsyncTask();
+        UpdateBusinessCardAsyncTask updateBusinessCardAsyncTask =
+                new UpdateBusinessCardAsyncTask(context, oldBusinessCard.getId(), mListener);
         updateBusinessCardAsyncTask.execute(businessCard);
     }
 
@@ -209,13 +206,27 @@ public class MyBusinessCardDialog implements View.OnClickListener {
     }
 
 
-    private class UpdateBusinessCardAsyncTask extends AsyncTask<BusinessCard, Void, BusinessCard> {
+    private static class UpdateBusinessCardAsyncTask extends AsyncTask<BusinessCard, Void, BusinessCard> {
+
+        private WeakReference<Context> contextWeakReference;
+        private IGenerateBusinessCardListener iGenerateBusinessCardListener;
+        private int oldBusinessCardId;
+
+        UpdateBusinessCardAsyncTask(Context context, int id, IGenerateBusinessCardListener listener) {
+            contextWeakReference = new WeakReference<>(context);
+            oldBusinessCardId = id;
+            iGenerateBusinessCardListener = listener;
+        }
 
         @Override
         protected BusinessCard doInBackground(BusinessCard... businessCards) {
-            int theNumberAfterUpdate = dataBaseHelper.updateBusinessCard(oldBusinessCard.getId(), businessCards[0]);
-            if (theNumberAfterUpdate > 0) {
-                return businessCards[0];
+            Context context = contextWeakReference.get();
+            if (context != null) {
+                DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
+                int theNumberAfterUpdate = dataBaseHelper.updateBusinessCard(oldBusinessCardId, businessCards[0]);
+                if (theNumberAfterUpdate > 0) {
+                    return businessCards[0];
+                }
             }
             return null;
         }
@@ -223,10 +234,13 @@ public class MyBusinessCardDialog implements View.OnClickListener {
         @Override
         protected void onPostExecute(BusinessCard businessCard) {
             super.onPostExecute(businessCard);
-            if (businessCard != null) {
-                mListener.getBusinessCard(businessCard);
-            } else {
-                Toast.makeText(context, "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+            Context context = contextWeakReference.get();
+            if (context != null) {
+                if (businessCard != null) {
+                    iGenerateBusinessCardListener.getBusinessCard(businessCard);
+                } else {
+                    Toast.makeText(context, "Insert BusinessCard Failed!", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
