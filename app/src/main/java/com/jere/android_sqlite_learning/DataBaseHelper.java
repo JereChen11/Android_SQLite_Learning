@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.AsyncTask;
 
 import com.jere.android_sqlite_learning.model.BusinessCard;
 
@@ -17,7 +16,7 @@ import androidx.annotation.Nullable;
  * @author jere
  */
 public class DataBaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "business_card_db";
 
     public DataBaseHelper(@Nullable Context context) {
@@ -27,15 +26,34 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(BusinessCard.CREATE_TABLE);
-
+        sqLiteDatabase.execSQL(BusinessCard.CREATE_COMPNAY_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        /**在很多Demo中为了简单，直接删除重建表
         //drop old table if is existed
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusinessCard.TABLE_NAME);
         //create table again
-        onCreate(sqLiteDatabase);
+        onCreate(sqLiteDatabase); **/
+
+        //但在实际开发中需要严谨的对待数据库migration，一旦造成用户数据丢失，是很差的用户体验。
+        if (oldVersion < 2) {
+            upgradeVersion2(sqLiteDatabase);
+        }
+    }
+
+    private void upgradeVersion2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + BusinessCard.TABLE_NAME + " ADD COLUMN " + BusinessCard.COLUMN_COMMENT + " TEXT");
+    }
+
+    //需要测试一下回滚DB, 数据库降级，数据库版本从4降到3
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion > 2) { //DATABASE_VERSION == 3
+            db.execSQL("DROP TABLE IF EXISTS company");
+        }
+//        super.onDowngrade(db, oldVersion, newVersion);
     }
 
     /**

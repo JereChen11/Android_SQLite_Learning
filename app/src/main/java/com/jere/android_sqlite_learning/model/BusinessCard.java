@@ -11,6 +11,7 @@ public class BusinessCard {
     public static final String COLUMN_GENDER = "gender";
     public static final String COLUMN_TELEPHONE = "telephone";
     public static final String COLUMN_ADDRESS = "address";
+    public static final String COLUMN_COMMENT = "comment";
 
     public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -21,6 +22,10 @@ public class BusinessCard {
             + COLUMN_ADDRESS + " TEXT"
             + ")";
 
+    public static final String CREATE_COMPNAY_TABLE = "CREATE TABLE " + "Company" + "("
+            + "_id" + " INTEGER PRIMARY KEY AUTOINCREMENT," + "name" + " TEXT,"
+            + "telephone" + " TEXT," + "address" + " TEXT" + ")";
+
     private int id;
     private int avatar;
     private String name;
@@ -28,6 +33,7 @@ public class BusinessCard {
     //true:male, false:female
     private boolean gender;
     private String address;
+    private String comment;
 
     public int getId() {
         return id;
@@ -75,5 +81,13 @@ public class BusinessCard {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
