@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
  * @author jere
  */
 public class DataBaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "business_card_db";
 
     public DataBaseHelper(@Nullable Context context) {
@@ -47,7 +47,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("ALTER TABLE " + BusinessCard.TABLE_NAME + " ADD COLUMN " + BusinessCard.COLUMN_COMMENT + " TEXT");
     }
 
-    //需要测试一下回滚DB, 数据库降级，数据库版本从4降到3
+    //需要测试一下回滚DB, 数据库降级，数据库版本从3降到2
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion > 2) { //DATABASE_VERSION == 3
